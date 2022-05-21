@@ -1,0 +1,12 @@
+C:\Users\Alexey\RiderProjects\AntFarm\AntFarm\obj\Debug\AntFarm.csprojAssemblyReference.cache
+C:\Users\Alexey\RiderProjects\AntFarm\AntFarm\obj\Debug\AntFarm.csproj.CoreCompileInputs.cache
+C:\Users\Alexey\RiderProjects\AntFarm\AntFarm\bin\Debug\AntFarm.exe
+C:\Users\Alexey\RiderProjects\AntFarm\AntFarm\bin\Debug\AntFarm.pdb
+C:\Users\Alexey\RiderProjects\AntFarm\AntFarm\obj\Debug\AntFarm.exe
+C:\Users\Alexey\RiderProjects\AntFarm\AntFarm\obj\Debug\AntFarm.pdb
+C:\Users\Alexey\Desktop\RiderProjects\AntFarm\AntFarm\bin\Debug\AntFarm.exe
+C:\Users\Alexey\Desktop\RiderProjects\AntFarm\AntFarm\bin\Debug\AntFarm.pdb
+C:\Users\Alexey\Desktop\RiderProjects\AntFarm\AntFarm\obj\Debug\AntFarm.csprojAssemblyReference.cache
+C:\Users\Alexey\Desktop\RiderProjects\AntFarm\AntFarm\obj\Debug\AntFarm.csproj.CoreCompileInputs.cache
+C:\Users\Alexey\Desktop\RiderProjects\AntFarm\AntFarm\obj\Debug\AntFarm.exe
+C:\Users\Alexey\Desktop\RiderProjects\AntFarm\AntFarm\obj\Debug\AntFarm.pdb
