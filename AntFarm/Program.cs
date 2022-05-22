@@ -64,7 +64,7 @@ namespace AntFarm
 
         public static AntWorker oldStupidWorker = new AntWorker(2, 4, greenColony.colonyName, new List<EResources>()
                 { EResources.Stones, EResources.Dewdrops }, 1,
-            new Resources(0, 0, 0, 0), new List<Specials>() { Specials.Stupid },"старший");
+            new Resources(0, 0, 0, 0), new List<Specials>() { Specials.Stupid },"старший глупый");
 
         public static AntWorker advancedWorker = new AntWorker(6, 2, blackColony.colonyName, new List<EResources>()
                 { EResources.Sticks, EResources.Leaves }, 2,
@@ -73,7 +73,7 @@ namespace AntFarm
         public static AntWorker eliteQueenFavoriteWorker = new AntWorker(8, 4, blackColony.colonyName,
             new List<EResources>()
                 { EResources.Sticks, EResources.Leaves }, 2,
-            new Resources(0, 0, 0, 0), new List<Specials>() { Specials.QueenFavorite },"элитный");
+            new Resources(0, 0, 0, 0), new List<Specials>() { Specials.QueenFavorite },"элитный любимчик королевы");
 
         public static AntWorker ledgendaryWorker = new AntWorker(10, 6, orangeColony.colonyName, new List<EResources>()
                 { EResources.Stones, EResources.Dewdrops, EResources.Sticks }, 3,
@@ -81,25 +81,25 @@ namespace AntFarm
 
         public static AntWorker oldVeteranWorker = new AntWorker(2, 1, orangeColony.colonyName, new List<EResources>()
                 { EResources.Stones, EResources.Sticks }, 1,
-            new Resources(0, 0, 0, 0), new List<Specials>() { Specials.Veteran },"старший");
+            new Resources(0, 0, 0, 0), new List<Specials>() { Specials.Veteran },"старший ветеран");
 
         public static AntWarrior legendaryWarrior = new AntWarrior(10, 6, 6, 1, 3, greenColony.colonyName,
             new List<Specials>() { },"легендарный");
 
         public static AntWarrior fatAdvancedWarrior = new AntWarrior(6, 2, 4, 1, 2, greenColony.colonyName,
-            new List<Specials>() { Specials.Fat },"продвинутый");
+            new List<Specials>() { Specials.Fat },"продвинутый толстый");
 
         public static AntWarrior advancedWarrior = new AntWarrior(6, 2, 4, 1, 2, orangeColony.colonyName,
             new List<Specials>() { },"продвинутый");
 
         public static AntWarrior elitePhoenixWarrior = new AntWarrior(8, 4, 4, 2, 2, orangeColony.colonyName,
-            new List<Specials>() { Specials.Phoenix },"элитный");
+            new List<Specials>() { Specials.Phoenix },"элитный феникс");
 
         public static AntWarrior eliteWarrior = new AntWarrior(8, 4, 4, 2, 2, blackColony.colonyName,
             new List<Specials>() { },"элитный");
 
         public static AntWarrior legendaryMythicWarrior = new AntWarrior(10, 6, 6, 1, 3, blackColony.colonyName,
-            new List<Specials>() { Specials.Mythic },"легендарный");
+            new List<Specials>() { Specials.Mythic },"легендарный мифический");
 
         public static UniqueAnt Medvedka = new UniqueAnt(24, 8, greenColony.colonyName,
             new List<Specials>() { Specials.Lazy, Specials.Peaceful, Specials.Suspectful },"обычный");
@@ -234,14 +234,14 @@ namespace AntFarm
 
         static void Main(string[] args)
         {
-            greenColony.queen.aviableWorkersToRecruit = new List<Ant>() { eliteWorker, oldStupidWorker };
-            greenColony.queen.aviableWarriorsToRecruit = new List<Ant>() { legendaryWarrior, fatAdvancedWarrior };
+            greenColony.queen.aviableWorkersToRecruit = new List<AntWorker>() { eliteWorker, oldStupidWorker };
+            greenColony.queen.aviableWarriorsToRecruit = new List<AntWarrior>() { legendaryWarrior, fatAdvancedWarrior };
 
-            orangeColony.queen.aviableWorkersToRecruit = new List<Ant>() { ledgendaryWorker, oldVeteranWorker };
-            orangeColony.queen.aviableWarriorsToRecruit = new List<Ant>() { advancedWarrior, elitePhoenixWarrior };
+            orangeColony.queen.aviableWorkersToRecruit = new List<AntWorker>() { ledgendaryWorker, oldVeteranWorker };
+            orangeColony.queen.aviableWarriorsToRecruit = new List<AntWarrior>() { advancedWarrior, elitePhoenixWarrior };
 
-            blackColony.queen.aviableWorkersToRecruit = new List<Ant>() { advancedWorker, eliteQueenFavoriteWorker };
-            blackColony.queen.aviableWarriorsToRecruit = new List<Ant>() { eliteWarrior, legendaryMythicWarrior };
+            blackColony.queen.aviableWorkersToRecruit = new List<AntWorker>() { advancedWorker, eliteQueenFavoriteWorker };
+            blackColony.queen.aviableWarriorsToRecruit = new List<AntWarrior>() { eliteWarrior, legendaryMythicWarrior };
 
             for (int i = 0; i < colonies.Count; i++)
             {
@@ -373,7 +373,13 @@ namespace AntFarm
                               $"урон={queen.damage}");
             resources.ShowValues();
             Console.WriteLine("<<<<<<<<<<<<<Рабочие>>>>>>>>>>>>>");
-            Console.WriteLine("<<<<<<<<<<<<<Рабочие>>>>>>>>>>>>>");
+            for (int i = 0; i < queen.aviableWorkersToRecruit.Count; i++)
+            {
+                Console.WriteLine($"Тип: {queen.aviableWorkersToRecruit[i].type}");
+                Console.WriteLine($"Параметры: здоровье={queen.aviableWorkersToRecruit[i].health}, защита={queen.aviableWorkersToRecruit[i].defence}");
+                Console.WriteLine($"Количество: {population.antWorkersPopulation.Count}");
+            }
+            Console.WriteLine("");
             
             
             
@@ -399,8 +405,8 @@ namespace AntFarm
         public int maxQueens;
         public int queenLimit;
         
-        public List<Ant> aviableWorkersToRecruit;
-        public List<Ant> aviableWarriorsToRecruit;
+        public List<AntWorker> aviableWorkersToRecruit;
+        public List<AntWarrior> aviableWarriorsToRecruit;
         public List<Larva> currentLarvas = new List<Larva>();
         public QueenLarva queenLarva;
         public static int queenID = 0;
@@ -465,8 +471,8 @@ namespace AntFarm
         {
             Queen queen = new Queen(this.name, this.health, this.damage, this.defence, this.minLarvaGrowCycle,
                 this.maxLarvaGrowCycle, 0, 0);
-            queen.aviableWorkersToRecruit = new List<Ant>(this.aviableWorkersToRecruit);
-            queen.aviableWarriorsToRecruit = new List<Ant>(this.aviableWarriorsToRecruit);
+            queen.aviableWorkersToRecruit = new List<AntWorker>(this.aviableWorkersToRecruit);
+            queen.aviableWarriorsToRecruit = new List<AntWarrior>(this.aviableWarriorsToRecruit);
             return queen;
         }
     }
