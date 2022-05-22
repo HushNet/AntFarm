@@ -60,55 +60,55 @@ namespace AntFarm
 
         public static AntWorker eliteWorker = new AntWorker(8, 4, greenColony.colonyName, new List<EResources>()
                 { EResources.Dewdrops, EResources.Dewdrops }, 2,
-            new Resources(0, 0, 0, 0), new List<Specials>() { });
+            new Resources(0, 0, 0, 0), new List<Specials>() { }, "элитный");
 
         public static AntWorker oldStupidWorker = new AntWorker(2, 4, greenColony.colonyName, new List<EResources>()
                 { EResources.Stones, EResources.Dewdrops }, 1,
-            new Resources(0, 0, 0, 0), new List<Specials>() { Specials.Stupid });
+            new Resources(0, 0, 0, 0), new List<Specials>() { Specials.Stupid },"старший");
 
         public static AntWorker advancedWorker = new AntWorker(6, 2, blackColony.colonyName, new List<EResources>()
                 { EResources.Sticks, EResources.Leaves }, 2,
-            new Resources(0, 0, 0, 0), new List<Specials>());
+            new Resources(0, 0, 0, 0), new List<Specials>(),"продвинутый");
 
         public static AntWorker eliteQueenFavoriteWorker = new AntWorker(8, 4, blackColony.colonyName,
             new List<EResources>()
                 { EResources.Sticks, EResources.Leaves }, 2,
-            new Resources(0, 0, 0, 0), new List<Specials>() { Specials.QueenFavorite });
+            new Resources(0, 0, 0, 0), new List<Specials>() { Specials.QueenFavorite },"элитный");
 
         public static AntWorker ledgendaryWorker = new AntWorker(10, 6, orangeColony.colonyName, new List<EResources>()
                 { EResources.Stones, EResources.Dewdrops, EResources.Sticks }, 3,
-            new Resources(0, 0, 0, 0), new List<Specials>() { });
+            new Resources(0, 0, 0, 0), new List<Specials>() { },"легендарный");
 
         public static AntWorker oldVeteranWorker = new AntWorker(2, 1, orangeColony.colonyName, new List<EResources>()
                 { EResources.Stones, EResources.Sticks }, 1,
-            new Resources(0, 0, 0, 0), new List<Specials>() { Specials.Veteran });
+            new Resources(0, 0, 0, 0), new List<Specials>() { Specials.Veteran },"старший");
 
         public static AntWarrior legendaryWarrior = new AntWarrior(10, 6, 6, 1, 3, greenColony.colonyName,
-            new List<Specials>() { });
+            new List<Specials>() { },"легендарный");
 
         public static AntWarrior fatAdvancedWarrior = new AntWarrior(6, 2, 4, 1, 2, greenColony.colonyName,
-            new List<Specials>() { Specials.Fat });
+            new List<Specials>() { Specials.Fat },"продвинутый");
 
         public static AntWarrior advancedWarrior = new AntWarrior(6, 2, 4, 1, 2, orangeColony.colonyName,
-            new List<Specials>() { });
+            new List<Specials>() { },"продвинутый");
 
         public static AntWarrior elitePhoenixWarrior = new AntWarrior(8, 4, 4, 2, 2, orangeColony.colonyName,
-            new List<Specials>() { Specials.Phoenix });
+            new List<Specials>() { Specials.Phoenix },"элитный");
 
         public static AntWarrior eliteWarrior = new AntWarrior(8, 4, 4, 2, 2, blackColony.colonyName,
-            new List<Specials>() { });
+            new List<Specials>() { },"элитный");
 
         public static AntWarrior legendaryMythicWarrior = new AntWarrior(10, 6, 6, 1, 3, blackColony.colonyName,
-            new List<Specials>() { Specials.Mythic });
+            new List<Specials>() { Specials.Mythic },"легендарный");
 
         public static UniqueAnt Medvedka = new UniqueAnt(24, 8, greenColony.colonyName,
-            new List<Specials>() { Specials.Lazy, Specials.Peaceful, Specials.Suspectful });
+            new List<Specials>() { Specials.Lazy, Specials.Peaceful, Specials.Suspectful },"обычный");
 
         public static UniqueAnt Skarabei = new UniqueAnt(16, 8, greenColony.colonyName,
-            new List<Specials>() { Specials.Lazy, Specials.Peaceful, Specials.Epic });
+            new List<Specials>() { Specials.Lazy, Specials.Peaceful, Specials.Epic },"обычный");
 
         public static UniqueAnt Termit = new UniqueAnt(25, 7, greenColony.colonyName,
-            new List<Specials>() { Specials.Lazy, Specials.Peaceful, Specials.GodMode, Specials.Epic });
+            new List<Specials>() { Specials.Lazy, Specials.Peaceful, Specials.GodMode, Specials.Epic },"обычный");
 
         public static void StartDay()
         {
@@ -200,7 +200,6 @@ namespace AntFarm
                 colony.population.uniqueAnt.Trip();
             }
             
-            
 
             if (colony.queen.currentLarvas.Count <= 0 && colony.queen.queenLarva == null)
                 colony.queen.CreateLarvas(20);
@@ -254,11 +253,23 @@ namespace AntFarm
             //     heaps[i].resources.AddValues(500, 500, 500, 500);
             // }
 
-
+            StartDay();
             for (int i = 0; i != DryTimer; i++)
             {   
-                StartDay();
+                int ch = Console.Read();
+
+                switch (ch)
+                {
+                    case 1:
+                        StartDay();
+                        break;
+
+                }
             }
+            
+
+
+            
             
             Colony maxColony = colonies[0];
             for (int i = 0; i < colonies.Count; i++)
@@ -292,7 +303,14 @@ namespace AntFarm
             blackColony.population.Add(Termit,colony);
             
         }
+
+        public static void ShowColonyInfo()
+        {
+            int ch = Console.Read();
+            
+        }
     }
+
 
     class Colony
     {
@@ -312,6 +330,7 @@ namespace AntFarm
             _globalColonyNumber++;
             colonyNumber = _globalColonyNumber;
         }
+
         public void TryBornLarvas()
         {
             for (int i = 0; i < queen.currentLarvas.Count; i++)
@@ -329,23 +348,39 @@ namespace AntFarm
                     }
                 }
             }
+
             if (queen.queenLarva != null)
             {
                 if (queen.queenLarva.daysToBorn <= 0)
                 {
                     Process.colonies.Add(this.Clone());
                     queen.queenLarva = null;
-                
-                    Process.InitializeAnts(Process.colonies[Process.colonies.Count-1]);
-                    Console.WriteLine("COLONYYYYYYYYYYYY");
+
+                    Process.InitializeAnts(Process.colonies[Process.colonies.Count - 1]);
                 }
                 else
                 {
                     queen.queenLarva.daysToBorn--;
                 }
             }
-            
+
         }
+
+        public void ShowInfo()
+        {
+            Console.WriteLine($"Колония {colonyName} {colonyNumber}");
+            Console.WriteLine($"--- Королева <{queen.name}>: здоровье={queen.health}, защита={queen.defence}," +
+                              $"урон={queen.damage}");
+            resources.ShowValues();
+            Console.WriteLine("<<<<<<<<<<<<<Рабочие>>>>>>>>>>>>>");
+            Console.WriteLine("<<<<<<<<<<<<<Рабочие>>>>>>>>>>>>>");
+            
+            
+            
+            Console.WriteLine("<<<<<<<<<<<<<Воины>>>>>>>>>>>>>");
+
+        }
+
         public Colony Clone()
         {
             return new Colony(this.colonyName,queen.Clone(), new Dictionary<string, int>(this.startPopulation));
@@ -429,7 +464,7 @@ namespace AntFarm
         public Queen Clone()
         {
             Queen queen = new Queen(this.name, this.health, this.damage, this.defence, this.minLarvaGrowCycle,
-                this.maxLarvaGrowCycle, this.minQueens, this.maxQueens);
+                this.maxLarvaGrowCycle, 0, 0);
             queen.aviableWorkersToRecruit = new List<Ant>(this.aviableWorkersToRecruit);
             queen.aviableWarriorsToRecruit = new List<Ant>(this.aviableWarriorsToRecruit);
             return queen;
@@ -546,11 +581,11 @@ namespace AntFarm
 
         public void ShowValues()
         {
-            Console.WriteLine("Resources:");
-            Console.WriteLine($"Stone: {stones}");
-            Console.WriteLine($"Leaves: {leaves}");
-            Console.WriteLine($"Sticks: {sticks}");
-            Console.WriteLine($"Dewdrops: {dewdrops}");
+            Console.Write("Ресурсы: ");
+            Console.Write($"к: {stones} ");
+            Console.Write($"л: {leaves} ");
+            Console.Write($"в: {sticks} ");
+            Console.WriteLine($"р: {dewdrops}");
         }
     }
 
@@ -606,13 +641,15 @@ namespace AntFarm
         public List<Specials> specials;
         public Colony mainColony;
         public Heap currentHeap;
+        public string type;
 
-        public Ant(int health, int defence, string colonyName, List<Specials> specials)
+        public Ant(int health, int defence, string colonyName, List<Specials> specials, string type)
         {
             this.defence = defence;
             this.colonyName = colonyName;
             this.specials = specials;
             this.health = health + defence;
+            this.type = type;
             startHealth = health;
         }
 
@@ -622,6 +659,7 @@ namespace AntFarm
         public abstract void Trip();
 
         public abstract void BackToColony();
+        public abstract void Speak();
 
         public abstract object Clone(Colony colony);
     }
@@ -634,7 +672,7 @@ namespace AntFarm
         public int maxWeight;
 
         public AntWorker(int health, int defence, string colonyName, List<EResources> availableResources, int maxWeight,
-            Resources inventory, List<Specials> specials) : base(health, defence, colonyName, specials)
+            Resources inventory, List<Specials> specials, string type) : base(health, defence, colonyName, specials, type)
         {
             this.availableResources = availableResources;
             this.maxWeight = maxWeight;
@@ -794,11 +832,18 @@ namespace AntFarm
             currentHeap = null;
         }
 
+        public override void Speak()
+        {
+            Console.WriteLine($"Я рабочий из колонии {mainColony.colonyName}, " +
+                              $"у меня сейчас {inventory.SummAllResources()} ресурсов," +
+                              $"{health} здоровья и {defence} защиты, мою королеву зовут {mainColony.queen.name}");
+        }
+
         public override object Clone(Colony colony)
         {
             AntWorker antWorker = new AntWorker(this.health, this.defence, this.colonyName,
                 new List<EResources>(this.availableResources),
-                this.maxWeight, this.inventory, new List<Specials>(this.specials));
+                this.maxWeight, this.inventory, new List<Specials>(this.specials), type);
             antWorker.mainColony = colony;
             return antWorker;
         }
@@ -811,7 +856,7 @@ namespace AntFarm
         public int attacks;
 
         public AntWarrior(int health, int defence, int damage, int attacks, int maxTargets, string colonyName,
-            List<Specials> specials) : base(health, defence, colonyName, specials)
+            List<Specials> specials, string type) : base(health, defence, colonyName, specials, type)
         {
             this.damage = damage;
             this.attacks = attacks;
@@ -916,10 +961,15 @@ namespace AntFarm
         {
             currentHeap = null;
         }
-        
+
+        public override void Speak()
+        {
+            throw new NotImplementedException();
+        }
+
         public override object Clone(Colony colony)
         {
-            AntWarrior antWarrior = new AntWarrior(this.health, this.defence, this.damage, this.attacks, this.maxTargets,this.colonyName, new List<Specials>(this.specials));
+            AntWarrior antWarrior = new AntWarrior(this.health, this.defence, this.damage, this.attacks, this.maxTargets,this.colonyName, new List<Specials>(this.specials), this.type);
             antWarrior.mainColony = colony;
             return antWarrior;
         }
@@ -931,8 +981,8 @@ namespace AntFarm
         public int maxTargets;
         public int attacks;
 
-        public UniqueAnt(int health, int defence, string colonyName, List<Specials> specials) : base(health, defence,
-            colonyName, specials)
+        public UniqueAnt(int health, int defence, string colonyName, List<Specials> specials, string type) : base(health, defence,
+            colonyName, specials, type)
         {
         }
 
@@ -1016,9 +1066,14 @@ namespace AntFarm
             currentHeap = null;
         }
 
+        public override void Speak()
+        {
+            throw new NotImplementedException();
+        }
+
         public override object Clone(Colony colony)
         {
-            UniqueAnt uniqueAnt = new UniqueAnt(this.health,this.defence,this.colonyName,new List<Specials>(this.specials));
+            UniqueAnt uniqueAnt = new UniqueAnt(this.health,this.defence,this.colonyName,new List<Specials>(this.specials), type);
             uniqueAnt.mainColony = colony;
 
             return uniqueAnt;

@@ -10,3 +10,9 @@ C:\Users\Alexey\Desktop\RiderProjects\AntFarm\AntFarm\obj\Debug\AntFarm.csprojAs
 C:\Users\Alexey\Desktop\RiderProjects\AntFarm\AntFarm\obj\Debug\AntFarm.csproj.CoreCompileInputs.cache
 C:\Users\Alexey\Desktop\RiderProjects\AntFarm\AntFarm\obj\Debug\AntFarm.exe
 C:\Users\Alexey\Desktop\RiderProjects\AntFarm\AntFarm\obj\Debug\AntFarm.pdb
+C:\Users\Просто Я\RiderProjects\AntFarm\AntFarm\bin\Debug\AntFarm.exe
+C:\Users\Просто Я\RiderProjects\AntFarm\AntFarm\bin\Debug\AntFarm.pdb
+C:\Users\Просто Я\RiderProjects\AntFarm\AntFarm\obj\Debug\AntFarm.csprojAssemblyReference.cache
+C:\Users\Просто Я\RiderProjects\AntFarm\AntFarm\obj\Debug\AntFarm.csproj.CoreCompileInputs.cache
+C:\Users\Просто Я\RiderProjects\AntFarm\AntFarm\obj\Debug\AntFarm.exe
+C:\Users\Просто Я\RiderProjects\AntFarm\AntFarm\obj\Debug\AntFarm.pdb
