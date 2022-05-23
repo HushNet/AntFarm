@@ -102,17 +102,19 @@ namespace AntFarm
             new List<Specials>() { Specials.Mythic },"легендарный мифический");
 
         public static UniqueAnt Medvedka = new UniqueAnt(24, 8, greenColony.colonyName,
-            new List<Specials>() { Specials.Lazy, Specials.Peaceful, Specials.Suspectful },"обычный");
+            new List<Specials>() { Specials.Lazy, Specials.Peaceful, Specials.Suspectful },"обычный - Медведка");
 
         public static UniqueAnt Skarabei = new UniqueAnt(16, 8, greenColony.colonyName,
-            new List<Specials>() { Specials.Lazy, Specials.Peaceful, Specials.Epic },"обычный");
+            new List<Specials>() { Specials.Lazy, Specials.Peaceful, Specials.Epic },"обычный - Скарабей");
 
         public static UniqueAnt Termit = new UniqueAnt(25, 7, greenColony.colonyName,
-            new List<Specials>() { Specials.Lazy, Specials.Peaceful, Specials.GodMode, Specials.Epic },"обычный");
+            new List<Specials>() { Specials.Lazy, Specials.Peaceful, Specials.GodMode, Specials.Epic },"обычный - Термит");
 
         public static void StartDay()
         {
+            
             Day++;
+            Console.WriteLine("Экран 1 начало хода");
             Console.WriteLine("------------Ресурсы-------------");
             for (int i = 0; i < colonies.Count; i++)
             {
@@ -131,6 +133,10 @@ namespace AntFarm
                 TripAllAnts(colonies[i]);
             }
             
+
+            SendTripMessage();
+            
+            
             for (int i = 0; i < colonies.Count; i++)
             {
                 colonies[i].TryBornLarvas();
@@ -147,6 +153,8 @@ namespace AntFarm
 
                 heaps[i].visitors.Clear();
             }
+
+            SendBackMessage();
 
             for (int i = 0; i < heaps.Count; i++)
             {
@@ -199,10 +207,52 @@ namespace AntFarm
             {
                 colony.population.uniqueAnt.Trip();
             }
-            
-
             if (colony.queen.currentLarvas.Count <= 0 && colony.queen.queenLarva == null)
                 colony.queen.CreateLarvas(20);
+        }
+
+        public static void SendTripMessage()
+        {
+            Console.WriteLine("Экран 4 - Поход");
+            Console.WriteLine("Начало дня");
+            for (int i = 0; i < colonies.Count; i++)
+            {
+                int workers = 0, warriors = 0, unique = 0;
+                for (int j = 0; j < heaps.Count; j++)
+                {
+                    for (int k = 0; k < heaps[j].visitors.Count; k++)
+                    {
+                        if (heaps[j].visitors[k].mainColony.colonyNumber == colonies[i].colonyNumber)
+                        {
+                            if (heaps[j].visitors[k].GetType() == typeof(AntWorker))
+                            {
+                                workers++;
+                            }else if (heaps[j].visitors[k].GetType() == typeof(AntWarrior))
+                            {
+                                warriors++;
+                            }
+                            else
+                            {
+                                unique++;
+                            }
+                        }
+                    }
+
+                    Console.WriteLine($"С колонии {colonies[i].colonyName} {colonies[i].colonyNumber} отправились: р={workers}, в={warriors}, о={unique} на кучу {j+1}");
+                }
+            }
+        }
+        
+        public static void SendBackMessage()
+        {
+            Console.WriteLine("Конец дня");
+            for (int i = 0; i < colonies.Count; i++)
+            {
+                
+
+                    Console.WriteLine($"В колонию {colonies[i].colonyName} {colonies[i].colonyNumber} вернулись: " +
+                                      $"р={colonies[i].population.antWorkersPopulation.Count}, в={colonies[i].population.antWarriorsPopulation.Count}, о={(colonies[i].population.uniqueAnt!=null?1:0)}");
+            }
         }
 
         public static void ShowStartDayInfo()
@@ -252,25 +302,57 @@ namespace AntFarm
             // {
             //     heaps[i].resources.AddValues(500, 500, 500, 500);
             // }
-
+            
             StartDay();
-            for (int i = 0; i != DryTimer; i++)
-            {   
-                int ch = Console.Read();
 
+            while (true)
+            {
+                Console.WriteLine("Введите номер команды:");
+                Console.WriteLine("1-Следующий день, 2-Информация о колонии, 3-Информация о муравье");
+                int ch = Int32.Parse(Console.ReadLine());
                 switch (ch)
                 {
                     case 1:
                         StartDay();
                         break;
+                    case 2:
+                        Console.WriteLine($"Введите номер колонии: (1-{colonies.Count})");
+                        int colonyNumber = Int32.Parse(Console.ReadLine())-1;
+                        colonies[colonyNumber].ShowInfo();
+                        break;
+                    case 3:
+                        Console.WriteLine($"Введите номер колонии: (1-{colonies.Count})");
+                        int antColonyNumber = Int32.Parse(Console.ReadLine())-1;
+                        Console.WriteLine($"Укажите вид муравья(1-Рабочий, 2-Воин, 3-Особый)");
+                        int antType = Int32.Parse(Console.ReadLine());
+                        switch (antType)
+                        {
+                            case 1:
+                                Console.WriteLine($"Введите номер муравья(1-{colonies[antColonyNumber].population.antWorkersPopulation.Count}):");
+                                int antWorkerID = Int32.Parse(Console.ReadLine())-1;
+                                colonies[antColonyNumber].population.antWorkersPopulation[antWorkerID].Speak();
+                                break;
+                            case 2:
+                                Console.WriteLine($"Введите номер муравья(1-{colonies[antColonyNumber].population.antWarriorsPopulation.Count}):");
+                                int antWarriorID = Int32.Parse(Console.ReadLine())-1;
+                                colonies[antColonyNumber].population.antWarriorsPopulation[antWarriorID].Speak();
+                                break;
+                            case 3:
+                                colonies[antColonyNumber].population.uniqueAnt.Speak();
+                                break;
+                        }
+                        break;
 
                 }
+
+                if (Day == DryTimer)
+                {
+                    break;
+                }
             }
+                
             
 
-
-            
-            
             Colony maxColony = colonies[0];
             for (int i = 0; i < colonies.Count; i++)
             {
@@ -282,6 +364,7 @@ namespace AntFarm
             }
 
             Console.WriteLine($"Колония {maxColony.colonyName} {maxColony.colonyNumber} Победила!");
+            
         }
 
         public static void InitializeAnts(Colony colony)
@@ -303,12 +386,7 @@ namespace AntFarm
             blackColony.population.Add(Termit,colony);
             
         }
-
-        public static void ShowColonyInfo()
-        {
-            int ch = Console.Read();
-            
-        }
+        
     }
 
 
@@ -368,6 +446,7 @@ namespace AntFarm
 
         public void ShowInfo()
         {
+            Console.WriteLine("Экран 2 - Информация о колонии");
             Console.WriteLine($"Колония {colonyName} {colonyNumber}");
             Console.WriteLine($"--- Королева <{queen.name}>: здоровье={queen.health}, защита={queen.defence}," +
                               $"урон={queen.damage}");
@@ -375,15 +454,40 @@ namespace AntFarm
             Console.WriteLine("<<<<<<<<<<<<<Рабочие>>>>>>>>>>>>>");
             for (int i = 0; i < queen.aviableWorkersToRecruit.Count; i++)
             {
+                int countType = 0;
                 Console.WriteLine($"Тип: {queen.aviableWorkersToRecruit[i].type}");
                 Console.WriteLine($"Параметры: здоровье={queen.aviableWorkersToRecruit[i].health}, защита={queen.aviableWorkersToRecruit[i].defence}");
-                Console.WriteLine($"Количество: {population.antWorkersPopulation.Count}");
+                for (int j = 0; j < population.antWorkersPopulation.Count; j++)
+                {
+                    if (population.antWorkersPopulation[j].type == queen.aviableWorkersToRecruit[i].type)
+                    {
+                        countType++;
+                    }
+                }
+                Console.WriteLine($"Количество: {countType}");
             }
-            Console.WriteLine("");
-            
-            
             
             Console.WriteLine("<<<<<<<<<<<<<Воины>>>>>>>>>>>>>");
+            
+            for (int i = 0; i < queen.aviableWarriorsToRecruit.Count; i++)
+            {
+                int countType = 0;
+                Console.WriteLine($"Тип: {queen.aviableWarriorsToRecruit[i].type}");
+                Console.WriteLine($"Параметры: здоровье={queen.aviableWarriorsToRecruit[i].health}, защита={queen.aviableWarriorsToRecruit[i].defence}, урон={queen.aviableWarriorsToRecruit[i].damage}");
+                for (int j = 0; j < population.antWarriorsPopulation.Count; j++)
+                {
+                    if (population.antWarriorsPopulation[j].type == queen.aviableWarriorsToRecruit[i].type)
+                    {
+                        countType++;
+                    }
+                }
+                Console.WriteLine($"Количество: {countType}");
+            }
+            Console.WriteLine("<<<<<<<<<<<<<Особые>>>>>>>>>>>>>");
+            Console.WriteLine($"Тип: {population.uniqueAnt.type}");
+            Console.WriteLine($"Параметры: здоровье={population.uniqueAnt.health}, защита={population.uniqueAnt.defence}");
+            
+            
 
         }
 
@@ -504,6 +608,7 @@ namespace AntFarm
     {
         public List<AntWorker> antWorkersPopulation = new List<AntWorker>();
         public List<AntWarrior> antWarriorsPopulation = new List<AntWarrior>();
+
         public Ant uniqueAnt;
 
         public void Add(Ant ant, Colony colony)
@@ -970,7 +1075,8 @@ namespace AntFarm
 
         public override void Speak()
         {
-            throw new NotImplementedException();
+            Console.WriteLine($"Я воин из колонии {mainColony.colonyName}, " +
+                              $"у меня {health} здоровья, {damage} урона и {defence} защиты, мою королеву зовут {mainColony.queen.name}");
         }
 
         public override object Clone(Colony colony)
@@ -1074,7 +1180,8 @@ namespace AntFarm
 
         public override void Speak()
         {
-            throw new NotImplementedException();
+            Console.WriteLine($"Я особый из колонии {mainColony.colonyName}, " +
+                              $"у меня {health} здоровья, {damage} урона и {defence} защиты, мою королеву зовут {mainColony.queen.name}");
         }
 
         public override object Clone(Colony colony)
