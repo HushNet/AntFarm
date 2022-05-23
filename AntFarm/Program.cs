@@ -114,12 +114,9 @@ namespace AntFarm
         {
             
             Day++;
+            Console.WriteLine("//////////////////////////////");
             Console.WriteLine("Экран 1 начало хода");
-            Console.WriteLine("------------Ресурсы-------------");
-            for (int i = 0; i < colonies.Count; i++)
-            {
-                Console.WriteLine(colonies[i].colonyName + ":  " +  colonies[i].resources.SummAllResources());
-            }
+            Console.WriteLine("------------------------------");
             ShowStartDayInfo();
 
             int colonyRandomID = rand.Next(0, colonies.Count);
@@ -160,8 +157,13 @@ namespace AntFarm
             {
                 heaps[i].allowModificators = true;
             }
-            
 
+            for (int i = 0; i < colonies.Count; i++)
+            {
+                colonies[i].thisDayResources.ClearValues();
+                colonies[i].diesAnts.ClearAll();
+                colonies[i].newAnts.ClearAll();
+            }
         }
 
         public static void FightAllHeaps()
@@ -180,12 +182,12 @@ namespace AntFarm
                         {
                             heaps[i].visitors.Remove(currentAnt);
                             currentAnt.health = currentAnt.startHealth / 2;
-                           
                         }
                         else
                         {
                             heaps[i].visitors.Remove(currentAnt);
                             currentAnt.mainColony.population.Remove(currentAnt);
+                            currentAnt.mainColony.diesAnts.Add(currentAnt,currentAnt.mainColony);
                         }
                     }
                 }
@@ -213,7 +215,8 @@ namespace AntFarm
 
         public static void SendTripMessage()
         {
-            Console.WriteLine("Экран 4 - Поход");
+            Console.WriteLine("Экран 2 - Поход");
+            Console.WriteLine("------------------------------");
             Console.WriteLine("Начало дня");
             for (int i = 0; i < colonies.Count; i++)
             {
@@ -250,8 +253,14 @@ namespace AntFarm
             {
                 
 
-                    Console.WriteLine($"В колонию {colonies[i].colonyName} {colonies[i].colonyNumber} вернулись: " +
+                Console.WriteLine($"В колонию {colonies[i].colonyName} {colonies[i].colonyNumber} вернулись: " +
                                       $"р={colonies[i].population.antWorkersPopulation.Count}, в={colonies[i].population.antWarriorsPopulation.Count}, о={(colonies[i].population.uniqueAnt!=null?1:0)}");
+                Console.Write($"Добыто ресурсов: ");
+                colonies[i].thisDayResources.ShowValues();
+                Console.WriteLine($"Потери: р={colonies[i].diesAnts.antWorkersPopulation.Count}, в={colonies[i].diesAnts.antWarriorsPopulation.Count}, о={(colonies[i].diesAnts.uniqueAnt!=null?1:0)}");
+                Console.WriteLine($"Выросли: р={colonies[i].newAnts.antWorkersPopulation.Count}, в={colonies[i].newAnts.antWarriorsPopulation.Count}, о={(colonies[i].newAnts.uniqueAnt!=null?1:0)}");
+                Console.WriteLine($"Личинки растут: {colonies[i].queen.currentLarvas.Count}");
+                
             }
         }
 
@@ -279,6 +288,7 @@ namespace AntFarm
                               $" в={heap4.resources.sticks}, р={heap4.resources.dewdrops}");
 
             Console.WriteLine($"Глобальный эффект X: ");
+            Console.WriteLine();
         }
         
 
@@ -297,18 +307,13 @@ namespace AntFarm
             {
                 InitializeAnts(colonies[i]);
             }
-
-            // for (int i = 0; i < heaps.Count; i++) //Удалить это
-            // {
-            //     heaps[i].resources.AddValues(500, 500, 500, 500);
-            // }
             
             StartDay();
 
             while (true)
             {
                 Console.WriteLine("Введите номер команды:");
-                Console.WriteLine("1-Следующий день, 2-Информация о колонии, 3-Информация о муравье");
+                Console.WriteLine($"1-Следующий день({Day+1}), 2-Информация о колонии, 3-Информация о муравье");
                 int ch = Int32.Parse(Console.ReadLine());
                 switch (ch)
                 {
@@ -338,21 +343,25 @@ namespace AntFarm
                                 colonies[antColonyNumber].population.antWarriorsPopulation[antWarriorID].Speak();
                                 break;
                             case 3:
-                                colonies[antColonyNumber].population.uniqueAnt.Speak();
+                                if (colonies[antColonyNumber].population.uniqueAnt != null)
+	                            {
+                                    colonies[antColonyNumber].population.uniqueAnt.Speak();
+                                }
+                                else
+	                            {
+                                         Console.WriteLine("Особое насекомое отсутствует");
+	                            }
                                 break;
                         }
                         break;
-
                 }
 
                 if (Day == DryTimer)
                 {
                     break;
                 }
+                Console.WriteLine();
             }
-                
-            
-
             Colony maxColony = colonies[0];
             for (int i = 0; i < colonies.Count; i++)
             {
@@ -398,7 +407,10 @@ namespace AntFarm
         public Queen queen;
         public Dictionary<string, int> startPopulation;
         public AntPopulation population = new AntPopulation();
+        public AntPopulation diesAnts = new AntPopulation();
+        public AntPopulation newAnts = new AntPopulation();
         public Resources resources = new Resources(0, 0, 0, 0);
+        public Resources thisDayResources = new Resources(0, 0, 0, 0);
 
         public Colony(string colonyName, Queen queen, Dictionary<string, int> startPopulation)
         {
@@ -418,6 +430,7 @@ namespace AntFarm
                     if (queen.currentLarvas[i].daysToBorn <= 0)
                     {
                         population.Add((Ant)queen.currentLarvas[i].antType.Clone(this), this);
+                        newAnts.Add((Ant)queen.currentLarvas[i].antType.Clone(this), this);
                         queen.currentLarvas.Remove(queen.currentLarvas[i]);
                     }
                     else
@@ -446,7 +459,8 @@ namespace AntFarm
 
         public void ShowInfo()
         {
-            Console.WriteLine("Экран 2 - Информация о колонии");
+            Console.WriteLine("Экран 3 - Информация о колонии");
+            Console.WriteLine("------------------------------");
             Console.WriteLine($"Колония {colonyName} {colonyNumber}");
             Console.WriteLine($"--- Королева <{queen.name}>: здоровье={queen.health}, защита={queen.defence}," +
                               $"урон={queen.damage}");
@@ -468,7 +482,6 @@ namespace AntFarm
             }
             
             Console.WriteLine("<<<<<<<<<<<<<Воины>>>>>>>>>>>>>");
-            
             for (int i = 0; i < queen.aviableWarriorsToRecruit.Count; i++)
             {
                 int countType = 0;
@@ -484,8 +497,16 @@ namespace AntFarm
                 Console.WriteLine($"Количество: {countType}");
             }
             Console.WriteLine("<<<<<<<<<<<<<Особые>>>>>>>>>>>>>");
-            Console.WriteLine($"Тип: {population.uniqueAnt.type}");
-            Console.WriteLine($"Параметры: здоровье={population.uniqueAnt.health}, защита={population.uniqueAnt.defence}");
+            if (population.uniqueAnt != null)
+	        {
+                Console.WriteLine($"Тип: {population.uniqueAnt.type}");
+                Console.WriteLine($"Параметры: здоровье={population.uniqueAnt.health}, защита={population.uniqueAnt.defence}");
+                Console.WriteLine();
+            }
+            else
+            {
+                Console.WriteLine("Особые насекомые отсутсвуют");
+            }
             
             
 
@@ -555,7 +576,6 @@ namespace AntFarm
                 }
                 else
                 {
-                    Console.WriteLine("QUEEEEEEEEEEEEEEEEn");
                     if (queenLimit > 0)
                     {
                         queenLarva = new QueenLarva(this.Clone(),Process.rand.Next(minLarvaGrowCycle,maxLarvaGrowCycle+1));
@@ -645,6 +665,12 @@ namespace AntFarm
             }
             
         }
+        public void ClearAll()
+        {
+            antWorkersPopulation.Clear();
+            antWarriorsPopulation.Clear();
+            uniqueAnt = null;
+        }
     }
     class Resources
     {
@@ -692,11 +718,10 @@ namespace AntFarm
 
         public void ShowValues()
         {
-            Console.Write("Ресурсы: ");
-            Console.Write($"к: {stones} ");
-            Console.Write($"л: {leaves} ");
-            Console.Write($"в: {sticks} ");
-            Console.WriteLine($"р: {dewdrops}");
+            Console.Write($"к={stones} ");
+            Console.Write($"л={leaves} ");
+            Console.Write($"в={sticks} ");
+            Console.WriteLine($"р={dewdrops}");
         }
     }
 
@@ -939,6 +964,7 @@ namespace AntFarm
         public override void BackToColony()
         {
             mainColony.resources.AddValues(inventory.stones,inventory.leaves, inventory.sticks,inventory.dewdrops);
+            mainColony.thisDayResources.AddValues(inventory.stones, inventory.leaves, inventory.sticks, inventory.dewdrops);
             inventory.ClearValues();
             currentHeap = null;
         }
