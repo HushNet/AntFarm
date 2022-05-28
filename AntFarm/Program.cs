@@ -104,10 +104,10 @@ namespace AntFarm
         public static UniqueAnt Medvedka = new UniqueAnt(24, 8, greenColony.colonyName,
             new List<Specials>() { Specials.Lazy, Specials.Peaceful, Specials.Suspectful },"обычный - Медведка");
 
-        public static UniqueAnt Skarabei = new UniqueAnt(16, 8, greenColony.colonyName,
+        public static UniqueAnt Skarabei = new UniqueAnt(16, 8, orangeColony.colonyName,
             new List<Specials>() { Specials.Lazy, Specials.Peaceful, Specials.Epic },"обычный - Скарабей");
 
-        public static UniqueAnt Termit = new UniqueAnt(25, 7, greenColony.colonyName,
+        public static UniqueAnt Termit = new UniqueAnt(25, 7, blackColony.colonyName,
             new List<Specials>() { Specials.Lazy, Specials.Peaceful, Specials.GodMode, Specials.Epic },"обычный - Термит");
 
         public static void StartDay()
@@ -132,13 +132,7 @@ namespace AntFarm
             
 
             SendTripMessage();
-            
-            
-            for (int i = 0; i < colonies.Count; i++)
-            {
-                colonies[i].TryBornLarvas();
-            }
-            
+
             FightAllHeaps();
             
             for (int i = 0; i < heaps.Count; i++)
@@ -152,6 +146,8 @@ namespace AntFarm
             }
 
             SendBackMessage();
+            
+
 
             for (int i = 0; i < heaps.Count; i++)
             {
@@ -234,7 +230,7 @@ namespace AntFarm
                             {
                                 warriors++;
                             }
-                            else
+                            else if (heaps[j].visitors[k].GetType() == typeof(UniqueAnt))
                             {
                                 unique++;
                             }
@@ -258,6 +254,10 @@ namespace AntFarm
                 Console.Write($"Добыто ресурсов: ");
                 colonies[i].thisDayResources.ShowValues();
                 Console.WriteLine($"Потери: р={colonies[i].diesAnts.antWorkersPopulation.Count}, в={colonies[i].diesAnts.antWarriorsPopulation.Count}, о={(colonies[i].diesAnts.uniqueAnt!=null?1:0)}");
+                for (int j = 0; j < colonies.Count; j++)
+                {
+                    colonies[j].TryBornLarvas();
+                }
                 Console.WriteLine($"Выросли: р={colonies[i].newAnts.antWorkersPopulation.Count}, в={colonies[i].newAnts.antWarriorsPopulation.Count}, о={(colonies[i].newAnts.uniqueAnt!=null?1:0)}");
                 Console.WriteLine($"Личинки растут: {colonies[i].queen.currentLarvas.Count}");
                 
@@ -296,12 +296,15 @@ namespace AntFarm
         {
             greenColony.queen.aviableWorkersToRecruit = new List<AntWorker>() { eliteWorker, oldStupidWorker };
             greenColony.queen.aviableWarriorsToRecruit = new List<AntWarrior>() { legendaryWarrior, fatAdvancedWarrior };
+            greenColony.queen.aviableUniqueAntToRecruit = (UniqueAnt)Medvedka.Clone(greenColony);
 
             orangeColony.queen.aviableWorkersToRecruit = new List<AntWorker>() { ledgendaryWorker, oldVeteranWorker };
             orangeColony.queen.aviableWarriorsToRecruit = new List<AntWarrior>() { advancedWarrior, elitePhoenixWarrior };
+            orangeColony.queen.aviableUniqueAntToRecruit = (UniqueAnt)Skarabei.Clone(orangeColony);
 
             blackColony.queen.aviableWorkersToRecruit = new List<AntWorker>() { advancedWorker, eliteQueenFavoriteWorker };
             blackColony.queen.aviableWarriorsToRecruit = new List<AntWarrior>() { eliteWarrior, legendaryMythicWarrior };
+            blackColony.queen.aviableUniqueAntToRecruit = (UniqueAnt)Termit.Clone(blackColony);
 
             for (int i = 0; i < colonies.Count; i++)
             {
@@ -390,10 +393,9 @@ namespace AntFarm
                 colony.queen.CreateAnt((AntWarrior)colony.queen.aviableWarriorsToRecruit[id], colony);
             }
 
-            greenColony.population.Add(Medvedka,colony);
-            orangeColony.population.Add(Skarabei,colony);
-            blackColony.population.Add(Termit,colony);
-            
+            colony.population.Add(colony.queen.aviableUniqueAntToRecruit,colony);
+            greenColony.population.uniqueAnt = null;
+
         }
         
     }
@@ -429,6 +431,10 @@ namespace AntFarm
                 {
                     if (queen.currentLarvas[i].daysToBorn <= 0)
                     {
+                        if (queen.currentLarvas[i].GetType() == typeof(UniqueAnt))
+                        {
+                            Console.WriteLine($"UniqueAnt {colonyName} {colonyNumber}------------------------------------------------1111111111111111111111111111111");
+                        }
                         population.Add((Ant)queen.currentLarvas[i].antType.Clone(this), this);
                         newAnts.Add((Ant)queen.currentLarvas[i].antType.Clone(this), this);
                         queen.currentLarvas.Remove(queen.currentLarvas[i]);
@@ -532,6 +538,7 @@ namespace AntFarm
         
         public List<AntWorker> aviableWorkersToRecruit;
         public List<AntWarrior> aviableWarriorsToRecruit;
+        public UniqueAnt aviableUniqueAntToRecruit;
         public List<Larva> currentLarvas = new List<Larva>();
         public QueenLarva queenLarva;
         public static int queenID = 0;
@@ -589,6 +596,8 @@ namespace AntFarm
                     
                 }
             }
+            currentLarvas.Add(new Larva(aviableUniqueAntToRecruit,Process.rand.Next(minLarvaGrowCycle,maxLarvaGrowCycle+1)));
+            
         }
 
         public Queen Clone()
@@ -597,6 +606,7 @@ namespace AntFarm
                 this.maxLarvaGrowCycle, 0, 0);
             queen.aviableWorkersToRecruit = new List<AntWorker>(this.aviableWorkersToRecruit);
             queen.aviableWarriorsToRecruit = new List<AntWarrior>(this.aviableWarriorsToRecruit);
+            queen.aviableUniqueAntToRecruit = this.aviableUniqueAntToRecruit;
             return queen;
         }
     }
@@ -629,7 +639,7 @@ namespace AntFarm
         public List<AntWorker> antWorkersPopulation = new List<AntWorker>();
         public List<AntWarrior> antWarriorsPopulation = new List<AntWarrior>();
 
-        public Ant uniqueAnt;
+        public UniqueAnt uniqueAnt;
 
         public void Add(Ant ant, Colony colony)
         {
