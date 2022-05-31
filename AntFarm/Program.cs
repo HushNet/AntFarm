@@ -35,6 +35,8 @@ namespace AntFarm
     {
         public static int DryTimer = 14;
         public static int Day = 0;
+        public static bool showHistory = false;
+        public static bool globalEffect = false;
 
         public static Random rand = new Random();
 
@@ -130,24 +132,28 @@ namespace AntFarm
                 TripAllAnts(colonies[i]);
             }
             
-
-            SendTripMessage();
-
+            if(showHistory)
+                SendTripMessage();
             FightAllHeaps();
             
             for (int i = 0; i < heaps.Count; i++)
             {
                 for (int j = 0; j < heaps[i].visitors.Count; j++)
                 {
-                    heaps[i].visitors[j].BackToColony();
+                    Ant returningAnt = heaps[i].visitors[j];
+                    returningAnt.mainColony.returnedAnts.Add(returningAnt,returningAnt.mainColony);
+                    returningAnt.BackToColony();
                 }
 
                 heaps[i].visitors.Clear();
             }
+            for (int j = 0; j < colonies.Count; j++)
+            {
+                colonies[j].TryBornLarvas();
+            }
 
-            SendBackMessage();
-            
-
+            if (showHistory)
+                SendBackMessage();
 
             for (int i = 0; i < heaps.Count; i++)
             {
@@ -159,6 +165,12 @@ namespace AntFarm
                 colonies[i].thisDayResources.ClearValues();
                 colonies[i].diesAnts.ClearAll();
                 colonies[i].newAnts.ClearAll();
+                colonies[i].returnedAnts.ClearAll();
+            }
+
+            if (Day == 6)
+            {
+                CreateRagnarok();
             }
         }
 
@@ -216,9 +228,10 @@ namespace AntFarm
             Console.WriteLine("Начало дня");
             for (int i = 0; i < colonies.Count; i++)
             {
-                int workers = 0, warriors = 0, unique = 0;
+                
                 for (int j = 0; j < heaps.Count; j++)
                 {
+                    int workers = 0, warriors = 0, unique = 0;
                     for (int k = 0; k < heaps[j].visitors.Count; k++)
                     {
                         if (heaps[j].visitors[k].mainColony.colonyNumber == colonies[i].colonyNumber)
@@ -250,14 +263,11 @@ namespace AntFarm
                 
 
                 Console.WriteLine($"В колонию {colonies[i].colonyName} {colonies[i].colonyNumber} вернулись: " +
-                                      $"р={colonies[i].population.antWorkersPopulation.Count}, в={colonies[i].population.antWarriorsPopulation.Count}, о={(colonies[i].population.uniqueAnt!=null?1:0)}");
+                                      $"р={colonies[i].returnedAnts.antWorkersPopulation.Count}, в={colonies[i].returnedAnts.antWarriorsPopulation.Count}, о={(colonies[i].returnedAnts.uniqueAnt!=null?1:0)}");
                 Console.Write($"Добыто ресурсов: ");
                 colonies[i].thisDayResources.ShowValues();
                 Console.WriteLine($"Потери: р={colonies[i].diesAnts.antWorkersPopulation.Count}, в={colonies[i].diesAnts.antWarriorsPopulation.Count}, о={(colonies[i].diesAnts.uniqueAnt!=null?1:0)}");
-                for (int j = 0; j < colonies.Count; j++)
-                {
-                    colonies[j].TryBornLarvas();
-                }
+
                 Console.WriteLine($"Выросли: р={colonies[i].newAnts.antWorkersPopulation.Count}, в={colonies[i].newAnts.antWarriorsPopulation.Count}, о={(colonies[i].newAnts.uniqueAnt!=null?1:0)}");
                 Console.WriteLine($"Личинки растут: {colonies[i].queen.currentLarvas.Count}");
                 
@@ -286,12 +296,9 @@ namespace AntFarm
                               $" в={heap3.resources.sticks}, р={heap3.resources.dewdrops}");
             Console.WriteLine($"Куча 4: к={heap4.resources.stones}, л={heap4.resources.leaves}," +
                               $" в={heap4.resources.sticks}, р={heap4.resources.dewdrops}");
-
-            Console.WriteLine($"Глобальный эффект X: ");
             Console.WriteLine();
         }
         
-
         static void Main(string[] args)
         {
             greenColony.queen.aviableWorkersToRecruit = new List<AntWorker>() { eliteWorker, oldStupidWorker };
@@ -311,13 +318,25 @@ namespace AntFarm
                 InitializeAnts(colonies[i]);
             }
             
+            while (true)
+            {
+                int ch = -1;
+                Console.WriteLine("Включить отображение истории похода? (1-да, 2-нет)");
+                bool tryCh = Int32.TryParse(Console.ReadLine(), out ch);
+                if (ch == 1)
+                {
+                    showHistory = true;
+                }
+                break;
+            }
+            
             StartDay();
-
             while (true)
             {
                 Console.WriteLine("Введите номер команды:");
                 Console.WriteLine($"1-Следующий день({Day+1}), 2-Информация о колонии, 3-Информация о муравье");
-                int ch = Int32.Parse(Console.ReadLine());
+                int ch = -1;
+                bool tryCh = Int32.TryParse(Console.ReadLine(), out ch);
                 switch (ch)
                 {
                     case 1:
@@ -358,6 +377,8 @@ namespace AntFarm
                         }
                         break;
                 }
+                
+
 
                 if (Day == DryTimer)
                 {
@@ -375,7 +396,7 @@ namespace AntFarm
                 }
             }
 
-            Console.WriteLine($"Колония {maxColony.colonyName} {maxColony.colonyNumber} Победила!");
+            Console.WriteLine($"Колония {maxColony.colonyName} {maxColony.colonyNumber} победила, набрав {maxColony.resources.SummAllResources()} ресурсов!");
             
         }
 
@@ -394,10 +415,34 @@ namespace AntFarm
             }
 
             colony.population.Add(colony.queen.aviableUniqueAntToRecruit,colony);
-            greenColony.population.uniqueAnt = null;
-
         }
-        
+
+        public static void CreateRagnarok()
+        {
+            Console.WriteLine($"Глобальный эффект: <Рагнарок> появляется колония только с войнами, " +
+                              $"которая нападает на другие колонии и бьют королев, королева участвует в боях, идет 1 день");
+            Colony ragnarokColony = new Colony("ragnarok", greenColony.queen.Clone(),new Dictionary<string, int>(){{ "workers", 0 }, { "warriors", 5 }, { "unique", 0 }});
+            InitializeAnts(ragnarokColony);
+            while (true)
+            {
+                int cID = rand.Next(0, colonies.Count);
+                int antID = rand.Next(0, ragnarokColony.population.antWarriorsPopulation.Count);
+                colonies[cID].queen.Duel(ragnarokColony.population.antWarriorsPopulation[antID]);
+                        
+                if(ragnarokColony.population.antWarriorsPopulation[antID].health <= 0)
+                    ragnarokColony.population.Remove(ragnarokColony.population.antWarriorsPopulation[antID]);
+                        
+                if (colonies[cID].queen.health <= 0)
+                {
+                    Console.WriteLine($"Колония {colonies[cID].colonyName} {colonies[cID].colonyNumber} потерпела поражение от колонии Рагнарек!");
+                    colonies.Remove(colonies[cID]);
+                    break;
+                }
+
+                if (ragnarokColony.population.antWarriorsPopulation.Count <= 0)
+                    break;
+            }
+        }
     }
 
 
@@ -411,6 +456,7 @@ namespace AntFarm
         public AntPopulation population = new AntPopulation();
         public AntPopulation diesAnts = new AntPopulation();
         public AntPopulation newAnts = new AntPopulation();
+        public AntPopulation returnedAnts = new AntPopulation();
         public Resources resources = new Resources(0, 0, 0, 0);
         public Resources thisDayResources = new Resources(0, 0, 0, 0);
 
@@ -431,13 +477,12 @@ namespace AntFarm
                 {
                     if (queen.currentLarvas[i].daysToBorn <= 0)
                     {
-                        if (queen.currentLarvas[i].GetType() == typeof(UniqueAnt))
+                        if (!(queen.currentLarvas[i].antType.GetType() == typeof(UniqueAnt) && population.uniqueAnt != null))
                         {
-                            Console.WriteLine($"UniqueAnt {colonyName} {colonyNumber}------------------------------------------------1111111111111111111111111111111");
+                            population.Add((Ant)queen.currentLarvas[i].antType.Clone(this), this);
+                            newAnts.Add((Ant)queen.currentLarvas[i].antType.Clone(this), this);
+                            queen.currentLarvas.Remove(queen.currentLarvas[i]);
                         }
-                        population.Add((Ant)queen.currentLarvas[i].antType.Clone(this), this);
-                        newAnts.Add((Ant)queen.currentLarvas[i].antType.Clone(this), this);
-                        queen.currentLarvas.Remove(queen.currentLarvas[i]);
                     }
                     else
                     {
@@ -556,6 +601,23 @@ namespace AntFarm
             this.maxQueens = maxQueens;
             this.name = name;
             queenLimit = Process.rand.Next(maxQueens, maxQueens + 1);
+        }
+        
+        public void Duel(Ant attcker)
+        {
+            if (attcker.GetType() == typeof(AntWarrior))
+            {
+                AntWarrior warrior = (AntWarrior)attcker;
+                for (int i = 0; i < warrior.attacks; i++)
+                {
+                    this.Damage(warrior.damage);
+                }
+                warrior.Damage(this.damage);
+            }
+        }
+        public void Damage(int value)
+        {
+            health -= value;
         }
 
         public void CreateAnt(Ant ant, Colony colony)
@@ -1013,16 +1075,28 @@ namespace AntFarm
         public void Attack(Heap currentHeap)
         {
             int targetID = -1;
-
+            bool flag = true;
             for (int i = 0; i < currentHeap.visitors.Count; i++)
             {
-                if (currentHeap.visitors[i].colonyName != this.colonyName && currentHeap.visitors[i].health > 0 && !currentHeap.visitors[i].specials.Contains(Specials.GodMode))
+                if (currentHeap.visitors[i].specials.Contains(Specials.Fat) && currentHeap.visitors[i].colonyName != this.colonyName && currentHeap.visitors[i].health > 0)
                 {
                     targetID = currentHeap.visitors.IndexOf(currentHeap.visitors[i]);
+                    flag = false;
                     break;
                 }
             }
-
+            if (true)
+            {
+                for (int i = 0; i < currentHeap.visitors.Count; i++)
+                {
+                    if (currentHeap.visitors[i].colonyName != this.colonyName && currentHeap.visitors[i].health > 0 && !currentHeap.visitors[i].specials.Contains(Specials.GodMode))
+                    {
+                        targetID = currentHeap.visitors.IndexOf(currentHeap.visitors[i]);
+                        break;
+                    }
+                }
+            }
+            
             if (targetID >= 0)
             {
                 currentHeap.visitors[targetID].Duel(this);
