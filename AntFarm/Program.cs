@@ -261,7 +261,6 @@ namespace AntFarm
             for (int i = 0; i < colonies.Count; i++)
             {
                 
-
                 Console.WriteLine($"В колонию {colonies[i].colonyName} {colonies[i].colonyNumber} вернулись: " +
                                       $"р={colonies[i].returnedAnts.antWorkersPopulation.Count}, в={colonies[i].returnedAnts.antWarriorsPopulation.Count}, о={(colonies[i].returnedAnts.uniqueAnt!=null?1:0)}");
                 Console.Write($"Добыто ресурсов: ");
